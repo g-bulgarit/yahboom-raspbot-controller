@@ -1,6 +1,11 @@
 import zmq
-from commons.commands import movementMessage, stopMessage, servoMessage
+import sys
+import os
+
+sys.path.append(os.getcwd())
+from packages.commons.commands import movementMessage, stopMessage, servoMessage
 from pynput import keyboard
+
 
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
@@ -8,8 +13,7 @@ socket.connect("tcp://192.168.1.197:5678")
 
 
 def on_press(key):
-    if key == keyboard.Key.esc:
-        stop = True
+    msg = False
     if key.char == "w":
         msg = movementMessage(1, 255, 1, 255)
     if key.char == "s":
@@ -34,8 +38,9 @@ def on_press(key):
     if key.char == "q":
         msg = stopMessage(0)
 
-    socket.send_pyobj(msg)
-    _ = socket.recv_pyobj()
+    if msg:
+        socket.send_pyobj(msg)
+        _ = socket.recv_pyobj()
 
 
 def on_release(key):

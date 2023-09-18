@@ -1,6 +1,11 @@
-import smbus
-from commons.exceptions import ConnectionLost
-from commons.commands import movementMessage, servoMessage, stopMessage
+import sys
+import os
+
+sys.path.append(os.getcwd())
+
+from smbus2 import SMBus
+from packages.commons.exceptions import ConnectionLost
+from packages.commons.commands import movementMessage, servoMessage, stopMessage
 from typing import Union
 from loguru import logger
 from datetime import datetime
@@ -11,9 +16,10 @@ class Robot:
 
     def __init__(self) -> None:
         self.robot = self.i2c_connect()
+        pass
 
     def i2c_connect(self):
-        return smbus.SMBus(1)
+        return SMBus(1)
 
     def _write_byte(self, register: int, data: int) -> None:
         try:

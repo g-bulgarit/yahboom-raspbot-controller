@@ -1,6 +1,9 @@
 import zmq
-from commons.commands import statusMessage
-from robot_controller.robot_interface import Robot
+import sys
+import os
+
+sys.path.append(os.getcwd())
+from packages.robot_control.robot_interface import Robot
 
 if __name__ == "__main__":
     context = zmq.Context()
@@ -12,4 +15,4 @@ if __name__ == "__main__":
     while True:
         msg = socket.recv_pyobj()
         ret_code = robot.triage(msg)
-        socket.send_pyobj(statusMessage(ret_code))
+        socket.send_pyobj(True)
