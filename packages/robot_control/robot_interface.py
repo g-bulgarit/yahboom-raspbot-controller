@@ -5,10 +5,17 @@ sys.path.append(os.getcwd())
 
 from smbus2 import SMBus
 from packages.commons.exceptions import ConnectionLost
-from packages.commons.commands import movementMessage, servoMessage, stopMessage
+from packages.commons.commands import (
+    movementMessage,
+    servoMessage,
+    stopMessage,
+    honkMessage,
+)
 from typing import Union
 from loguru import logger
 from datetime import datetime
+
+from packages.robot_control.gpio_control import honk_in_thread
 
 
 class Robot:
@@ -36,17 +43,17 @@ class Robot:
     def triage(self, msg: Union[stopMessage, servoMessage, movementMessage]) -> bool:
         time_now = datetime.now().strftime("%H:%M:%S")
         if isinstance(msg, stopMessage):
-            logger.debug(f"{time_now} | Recieved stop command")
+            logger.debug(f"Recieved stop command")
             self._write_byte(0x02, 0x00)
             return True
 
         elif isinstance(msg, servoMessage):
-            logger.debug(f"{time_now} | Recieved servo command")
+            logger.debug(f"Recieved servo command")
             data = [msg.servo_id, msg.servo_angle]
             self._write_byte_array(0x03, data)
 
         elif isinstance(msg, movementMessage):
-            logger.debug(f"{time_now} | Recieved move command")
+            logger.debug(f"Recieved move command")
             data = [
                 msg.left_motor_dir,
                 msg.left_motor_speed,
@@ -55,6 +62,10 @@ class Robot:
             ]
             self._write_byte_array(0x01, data)
             return True
+
+        elif isinstance(msg, honkMessage):
+            logger.debug(f"Recieved honk command")
+            honk_in_thread()
 
         else:
             return False

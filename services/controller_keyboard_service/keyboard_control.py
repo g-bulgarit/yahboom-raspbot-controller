@@ -4,7 +4,12 @@ import os
 import time
 
 sys.path.append(os.getcwd())
-from packages.commons.commands import movementMessage, stopMessage, servoMessage
+from packages.commons.commands import (
+    movementMessage,
+    stopMessage,
+    servoMessage,
+    honkMessage,
+)
 from pynput import keyboard
 
 
@@ -19,7 +24,7 @@ tick_rate = 20
 
 def on_press(key):
     try:
-        if key.char in ["w", "a", "s", "d", "j", "k", "l", "o", "m"]:
+        if key.char in ["w", "a", "s", "d", "j", "k", "l", "o", "m", "h"]:
             pressed_keys.add(key.char)
     except AttributeError:
         pass
@@ -27,7 +32,7 @@ def on_press(key):
 
 def on_release(key):
     try:
-        if key.char in ["w", "a", "s", "d", "j", "k", "l", "o", "m"]:
+        if key.char in ["w", "a", "s", "d", "j", "k", "l", "o", "m", "h"]:
             pressed_keys.remove(key.char)
     except AttributeError:
         pass
@@ -60,6 +65,8 @@ def send_motion_command():
         msg = servoMessage(2, 120)
     elif pressed_keys == set():
         msg = stopMessage(0)
+    elif pressed_keys == {"h"}:
+        msg = honkMessage(0)
 
     # Mixed keys
     elif pressed_keys == {"w", "a"}:

@@ -23,3 +23,8 @@ class stopMessage:
 @dataclass
 class statusMessage:
     val: int
+
+
+@dataclass
+class honkMessage:
+    val: int
