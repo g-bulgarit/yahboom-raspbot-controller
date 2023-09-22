@@ -13,6 +13,7 @@ socket = context.socket(zmq.REQ)
 socket.connect("tcp://192.168.1.197:5678")
 
 pressed_keys = set()
+last_message = stopMessage(0)
 tick_rate = 20
 
 
@@ -33,6 +34,7 @@ def on_release(key):
 
 
 def send_motion_command():
+    global last_message
     # Single button combos
     if pressed_keys == {"w"}:
         msg = movementMessage(1, 200, 1, 200)
@@ -68,8 +70,10 @@ def send_motion_command():
         print(f"Exception case; pressed {pressed_keys}")
         msg = stopMessage(0)
 
-    socket.send_pyobj(msg)
-    _ = socket.recv_pyobj()
+    if not (isinstance(last_message, stopMessage) and isinstance(msg, stopMessage)):
+        socket.send_pyobj(msg)
+        _ = socket.recv_pyobj()
+    last_message = msg
 
 
 def launch_keyboard_listener():
