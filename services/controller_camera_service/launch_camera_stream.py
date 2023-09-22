@@ -1,6 +1,7 @@
 import subprocess
 
-if __name__ == "__main__":
+
+def launch_camera_stream():
     subprocess.run(
         [
             "start",
@@ -11,3 +12,7 @@ if __name__ == "__main__":
 
     while True:
         pass
+
+
+if __name__ == "__main__":
+    launch_camera_stream()

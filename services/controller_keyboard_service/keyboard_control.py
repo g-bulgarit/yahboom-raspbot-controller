@@ -35,13 +35,13 @@ def on_release(key):
 def send_motion_command():
     # Single button combos
     if pressed_keys == {"w"}:
-        msg = movementMessage(1, 255, 1, 255)
+        msg = movementMessage(1, 200, 1, 200)
     elif pressed_keys == {"s"}:
-        msg = movementMessage(0, 255, 0, 255)
+        msg = movementMessage(0, 200, 0, 200)
     elif pressed_keys == {"a"}:
-        msg = movementMessage(0, 255, 1, 255)
+        msg = movementMessage(0, 200, 1, 200)
     elif pressed_keys == {"d"}:
-        msg = movementMessage(1, 255, 0, 255)
+        msg = movementMessage(1, 200, 0, 200)
     elif pressed_keys == {"j"}:
         msg = servoMessage(1, 120)
     elif pressed_keys == {"k"}:
@@ -61,9 +61,9 @@ def send_motion_command():
 
     # Mixed keys
     elif pressed_keys == {"w", "a"}:
-        msg = movementMessage(1, 0, 1, 255)
+        msg = movementMessage(1, 80, 1, 200)
     elif pressed_keys == {"w", "d"}:
-        msg = movementMessage(1, 255, 1, 0)
+        msg = movementMessage(1, 200, 1, 80)
     else:
         print(f"Exception case; pressed {pressed_keys}")
         msg = stopMessage(0)
@@ -72,10 +72,14 @@ def send_motion_command():
     _ = socket.recv_pyobj()
 
 
-if __name__ == "__main__":
+def launch_keyboard_listener():
     listener = keyboard.Listener(on_press=on_press, on_release=on_release)
     listener.start()
 
     while True:
         send_motion_command()
         time.sleep(1 / tick_rate)
+
+
+if __name__ == "__main__":
+    launch_keyboard_listener()
