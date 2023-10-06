@@ -2,6 +2,7 @@ import zmq
 import sys
 import os
 import time
+from loguru import logger
 
 sys.path.append(os.getcwd())
 from packages.commons.commands import (
@@ -84,6 +85,7 @@ def send_motion_command():
 
 
 def launch_keyboard_listener():
+    logger.debug("Keyboard listener running.")
     listener = keyboard.Listener(on_press=on_press, on_release=on_release)
     listener.start()
 
