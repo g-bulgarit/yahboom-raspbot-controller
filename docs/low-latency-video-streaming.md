@@ -16,3 +16,9 @@ Working pipeline:
 ```
 rpicamsrc num-buffers=-1 ! video/x-raw, width=640, height=480, framerate=30/1 ! jpegenc ! rtpjpegpay name=pay0 pt=96
 ```
+
+A version with manual controls running through `gst-rtsp-server` looks like this:
+
+```
+./test-launch --gst-debug=3 "( rpicamsrc num-buffers=-1 awb-mode=1 exposure-mode=0 shutter-speed=33333 video-stabilisation=0 ! video/x-raw, width=640, height=480, framerate=30/1 ! jpegenc ! rtpjpegpay name=pay0 pt=96 )"
+```
