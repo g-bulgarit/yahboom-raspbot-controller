@@ -7,7 +7,7 @@ from services.controller_keyboard_service.keyboard_control import (
     launch_keyboard_listener,
 )
 
-from services.controller_camera_service.launch_camera_stream import launch_camera_stream
+from services.controller_camera_service.camera_stream import launch_camera_stream
 
 sys.path.append(os.getcwd())
 
