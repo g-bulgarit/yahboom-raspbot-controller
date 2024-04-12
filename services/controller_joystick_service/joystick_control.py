@@ -2,10 +2,19 @@ from enum import Enum, IntEnum
 import numpy as np
 from multiprocessing import Process, Array, Lock
 import time
+import zmq
+import sys
+import os
 
+sys.path.append(os.getcwd())
+from packages.commons.commands import (
+    movementMessage,
+    servoMessage,
+)
 
 DEFAULT_DELTA = 0.01
 DEADBAND = 0.03
+MAX_PAN_TILT_DELTA = 80
 
 
 class EventTypes(Enum):
@@ -82,10 +91,52 @@ def sample_joysticks_positions(joystick_data_array: Array):
                     joystick_data_array[3] = right_y
 
 
+MAX_MOTOR_VAL = 200
+
+
+def set_drive_motor_vectors(x, y) -> None:
+    l_val = -1 * MAX_MOTOR_VAL * (y - x) * 1.5
+    r_val = -1 * MAX_MOTOR_VAL * (y + x) * 1.5
+    l_sign, r_sign = False, False
+    if l_val > 0:
+        l_sign = True
+
+    if r_val > 0:
+        r_sign = True
+
+    l_val = min(int(l_val), 255)
+    r_val = min(int(r_val), 255)
+
+    msg = movementMessage(l_sign, np.abs(l_val), r_sign, np.abs(r_val))
+    socket.send_pyobj(msg)
+    _ = socket.recv_pyobj()
+
+
+def set_cam_motor_vectors(x, y) -> None:
+
+    pan = 90 + int(-1 * x * MAX_PAN_TILT_DELTA)
+    tilt = 90 + int(y * MAX_PAN_TILT_DELTA)
+
+    msg = servoMessage(1, pan)
+    socket.send_pyobj(msg)
+    _ = socket.recv_pyobj()
+
+    msg = servoMessage(2, tilt)
+    socket.send_pyobj(msg)
+    _ = socket.recv_pyobj()
+
+
 if __name__ == "__main__":
     jc = JoystickControl()
     jc.start_listener()
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect("tcp://192.168.1.197:5678")
+
     while True:
         lx, ly, rx, ry = jc.get_joystick_value()
-        print(f"{lx:.2f}, {ly:.2f} |  {rx:.2f}, {ry:.2f}")
+        set_drive_motor_vectors(lx, ly)
+        set_cam_motor_vectors(rx, ry)
+
+        # print(f"{msg.left_motor_speed:.2f}, {msg.right_motor_speed:.2f}")
         time.sleep(1 / 60)
