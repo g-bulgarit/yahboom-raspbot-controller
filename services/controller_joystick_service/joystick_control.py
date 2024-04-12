@@ -1,7 +1,6 @@
 from enum import Enum, IntEnum
 import numpy as np
 from multiprocessing import Process, Array, Lock
-import queue
 import time
 
 
